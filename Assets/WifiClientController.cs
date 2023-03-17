@@ -19,6 +19,10 @@ public class WifiClientController : MonoBehaviour
     [SerializeField] private Button _sendButton;
 
     [SerializeField] private InputField _inputField;
+
+    [SerializeField] private Text _fromServerText;
+
+    private string _fromServerTextValue;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,10 +33,11 @@ public class WifiClientController : MonoBehaviour
 
     private void SendToServer()
     {
-        /*
+        Debug.Log("SendToServer");
         var udpClient = new UdpClient();
         byte[] bytes = Encoding.UTF8.GetBytes($"client: {_inputField.text}");
-        udpClient.Send(bytes, bytes.Length, _serverEndPoint);*/
+        _serverEndPoint.Port = 2015;
+        Debug.Log("End SendToServer "+udpClient.Send(bytes, bytes.Length, _serverEndPoint));
     }
     private void BroadcastLoopListener()
     {
@@ -45,8 +50,12 @@ public class WifiClientController : MonoBehaviour
             if (receivedNotification != null && receivedNotification.Length > 0)
             {
                 string result = Encoding.UTF8.GetString(receivedNotification);
-                _serverConnectedTextValue = $"Connected\nEcho Server: {remoteEndPoint.Address.ToString()}";
+                _serverConnectedTextValue = $"Connected\nEcho Server: {remoteEndPoint.Address}";
                 _serverEndPoint = remoteEndPoint;
+                if (result.Contains("echo"))
+                {
+                    _fromServerTextValue = result;
+                }
                 Debug.Log(remoteEndPoint.Address.ToString() + " message: " + result);
             }
         }
@@ -56,5 +65,6 @@ public class WifiClientController : MonoBehaviour
     void Update()
     {
         _serverConnectedText.text = _serverConnectedTextValue;
+        _fromServerText.text = _fromServerTextValue;
     }
 }
